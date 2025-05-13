@@ -1,25 +1,13 @@
 import { SlHome } from 'react-icons/sl';
-import {
-  BsCalendar2Event,
-  BsCalendar4Event,
-  BsPersonVcard,
-  BsTrophy,
-} from 'react-icons/bs';
+import { BsCalendar2Event, BsPersonVcard } from 'react-icons/bs';
 import { HiOutlineMusicalNote } from 'react-icons/hi2';
-import {
-  RiCloseFill,
-  RiCoupon3Line,
-  RiGroupLine,
-  RiLogoutCircleLine,
-} from 'react-icons/ri';
+import { RiCloseFill, RiLogoutCircleLine } from 'react-icons/ri';
 import { AiOutlineUser } from 'react-icons/ai';
 import { Link } from 'react-router-dom';
 import { NavLink } from 'react-router-dom';
 import { useState } from 'react';
-import { CiMusicNote1 } from 'react-icons/ci';
-import { TbCategory2 } from 'react-icons/tb';
 
-import logo from '../../assets/logo.svg';
+import logo from '../../assets/logo.png';
 
 export default function Sidebar() {
   const [showMenu, setShowMenu] = useState(false);
@@ -77,7 +65,11 @@ export default function Sidebar() {
                   to='/'
                   className='flex items-center justify-center py-2 rounded-lg'
                 >
-                  {/* <img src={logo} alt='....' className='h-12 object-cover drop-shadow-lg' /> */}
+                  <img
+                    src={logo}
+                    alt='....'
+                    className='h-12 object-cover drop-shadow-lg'
+                  />
                   <h1 className='text-gray-150 text-3xl font-bold'>Banlao</h1>
                 </Link>
               </li>
