@@ -7,10 +7,12 @@ import Content from './pages/Content';
 import Users from './pages/Users';
 import UserView from './pages/UserView';
 import Faqs from './pages/Faqs';
-import UserFeedBack from './pages/UserFeedBack';
 import { ToastContainer } from 'react-toastify';
 import Properties from './pages/Properties';
 import PropertyView from './pages/PropertyView';
+import Banners from './pages/Banners';
+import Sales from './pages/Sales';
+import SaleView from './pages/SaleView';
 
 function App() {
   return (
@@ -19,12 +21,14 @@ function App() {
         <Route path='/' element={<RootLayout />}>
           <Route index element={<Home />} />
           <Route path='faqs' element={<Faqs />} />
-          <Route path='feedback' element={<UserFeedBack />} />
+          <Route path='banners' element={<Banners />} />
           <Route path='content' element={<Content />} />
           <Route path='users' element={<Users />} />
           <Route path='properties' element={<Properties />} />
+          <Route path='sales' element={<Sales />} />
           <Route path='users/view' element={<UserView />} />
           <Route path='property/view' element={<PropertyView />} />
+          <Route path='sale/view' element={<SaleView />} />
           <Route path='profile' element={<Profile />} />
         </Route>
         <Route path='/login' element={<Login />} />

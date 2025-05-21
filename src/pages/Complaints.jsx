@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom';
 import Header from '../layouts/partials/header';
 
-export default function Reports() {
+export default function Complaints() {
   return (
     <div>
       <Header header={'Manage Reports'} />
@@ -32,7 +32,7 @@ export default function Reports() {
                   type='search'
                   id='default-search'
                   className='block w-full px-4 py-2 outline-none pl-10 text-sm text-gray-900 border border-gray-300 rounded-full focus:ring-blue-500 focus:border-blue-500'
-                  placeholder='Search reports...'
+                  placeholder='Search complaints...'
                   required
                 />
               </div>

@@ -116,6 +116,32 @@ export default function Sidebar() {
                   </span>
                 </NavLink>
               </li>
+              <li onClick={() => handleTabClick('sellers')}>
+                <NavLink
+                  to='/sales'
+                  className={({ isActive, isPending }) => {
+                    return isActive
+                      ? 'flex items-center py-2 px-5 rounded-lg bg-gray-150 drop-shadow text-gray-50 font-semibold'
+                      : 'flex items-center py-2 px-5 text-gray-600 rounded-lg hover:bg-gray-150/10 drop-shadow hover:text-gray-150 hover:font-medium outline-none';
+                  }}
+                >
+                  <AiOutlineUser />
+                  <span className='flex-1 ml-3 whitespace-nowrap'>Sales</span>
+                </NavLink>
+              </li>
+              <li onClick={() => handleTabClick('dashboard')}>
+                <NavLink
+                  to='/banners'
+                  className={({ isActive, isPending }) => {
+                    return isActive
+                      ? 'flex items-center py-2 px-5 rounded-lg bg-gray-150 drop-shadow text-gray-50 font-semibold'
+                      : 'flex items-center py-2 px-5 text-gray-600 rounded-lg hover:bg-gray-150/10 drop-shadow hover:text-gray-150 hover:font-medium outline-none';
+                  }}
+                >
+                  <HiOutlineMusicalNote />
+                  <span className='flex-1 ml-3 whitespace-nowrap'>Banners</span>
+                </NavLink>
+              </li>
               <li onClick={() => handleTabClick('dashboard')}>
                 <NavLink
                   to='/faqs'
@@ -127,21 +153,6 @@ export default function Sidebar() {
                 >
                   <BsPersonVcard />
                   <span className='flex-1 ml-3 whitespace-nowrap'>FAQs</span>
-                </NavLink>
-              </li>
-              <li onClick={() => handleTabClick('dashboard')}>
-                <NavLink
-                  to='/feedback'
-                  className={({ isActive, isPending }) => {
-                    return isActive
-                      ? 'flex items-center py-2 px-5 rounded-lg bg-gray-150 drop-shadow text-gray-50 font-semibold'
-                      : 'flex items-center py-2 px-5 text-gray-600 rounded-lg hover:bg-gray-150/10 drop-shadow hover:text-gray-150 hover:font-medium outline-none';
-                  }}
-                >
-                  <HiOutlineMusicalNote />
-                  <span className='flex-1 ml-3 whitespace-nowrap'>
-                    User Feedback
-                  </span>
                 </NavLink>
               </li>
               <li onClick={() => handleTabClick('dashboard')}>
