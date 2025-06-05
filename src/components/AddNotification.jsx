@@ -3,33 +3,15 @@ import { Dialog, Transition } from '@headlessui/react';
 import { RxCross2, RxUpload } from 'react-icons/rx';
 import { toast } from 'react-toastify';
 
-export default function AddBanner({ isOpen, setIsOpen, viewOnly }) {
+export default function AddNotification({ isOpen, setIsOpen, viewOnly }) {
   const [formData, setFormData] = useState({
     title: '',
     description: '',
-    image: '',
-    imageFile: null,
-    imagePreview: null,
   });
-  // const { banner, createBanner, updateBanner, isLoading } = useBannerStore();
+  // const { notification, createNotification, updateNotification, isLoading } = useNotificationStore();
 
   const onChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
-
-  const handleImageChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setFormData((prev) => ({
-          ...prev,
-          imageFile: file,
-          imagePreview: reader.result,
-        }));
-      };
-      reader.readAsDataURL(file);
-    }
   };
 
   const onSubmit = async (e) => {
@@ -38,14 +20,13 @@ export default function AddBanner({ isOpen, setIsOpen, viewOnly }) {
       const finalForm = {
         title: formData.title,
         description: formData.description,
-        imageFile: formData.imageFile,
       };
-      // if (banner) {
-      //   updateBanner(banner.id, finalForm);
-      //   toast.success('Banner Updated Successfuly');
+      // if (notification) {
+      //   updateNotification(notification.id, finalForm);
+      //   toast.success('Notification Updated Successfuly');
       // } else {
-      //   await createBanner(finalForm);
-      //   toast.success('Banner Created Successfuly');
+      //   await createNotification(finalForm);
+      //   toast.success('Notification Created Successfuly');
       // }
       // resetForm();
       // closeModal();
@@ -58,9 +39,6 @@ export default function AddBanner({ isOpen, setIsOpen, viewOnly }) {
     setFormData({
       title: '',
       description: '',
-      image: '',
-      imageFile: null,
-      imagePreview: null,
     });
   };
 
@@ -69,18 +47,15 @@ export default function AddBanner({ isOpen, setIsOpen, viewOnly }) {
   }
 
   // useEffect(() => {
-  //   if (banner) {
+  //   if (notification) {
   //     setFormData({
-  //       title: banner.title,
-  //       description: banner.description,
-  //       image: banner.image,
-  //       imageFile: null,
-  //       imagePreview: banner.image,
+  //       title: notification.title,
+  //       description: notification.description,
   //     });
   //   } else {
   //     resetForm();
   //   }
-  // }, [banner]);
+  // }, [notification]);
 
   return (
     <div>
@@ -114,65 +89,11 @@ export default function AddBanner({ isOpen, setIsOpen, viewOnly }) {
                     as='h3'
                     className='text-lg font-medium leading-6 text-gray-900'
                   >
-                    {/* {banner ? 'Edit Banner' : 'Add Banner'} */} Add Banner
+                    {/* {notification ? 'Edit Notification' : 'Add Notification'} */}{' '}
+                    Add Notification
                   </Dialog.Title>
                   <form onSubmit={onSubmit}>
                     <div className='mt-2'>
-                      <div className='flex items-center justify-center w-full'>
-                        <label
-                          htmlFor='dropzone-file'
-                          className='flex flex-col items-center justify-center w-full h-44 rounded-lg border-2 border-gray-300 border-dashed cursor-pointer bg-gray-50 hover:bg-gray-100'
-                        >
-                          {formData.imagePreview ? (
-                            <div className='relative w-full h-full'>
-                              <img
-                                src={formData.imagePreview}
-                                alt='Preview'
-                                className='w-full h-full object-cover rounded-lg'
-                              />
-                              <div className='absolute inset-0 bg-black bg-opacity-30 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity'>
-                                <span className='text-white font-medium'>
-                                  Change Image
-                                </span>
-                              </div>
-                            </div>
-                          ) : (
-                            <div className='flex flex-col items-center justify-center pt-5 pb-6'>
-                              <svg
-                                className='w-8 h-8 mb-4 text-gray-500'
-                                aria-hidden='true'
-                                xmlns='http://www.w3.org/2000/svg'
-                                fill='none'
-                                viewBox='0 0 20 16'
-                              >
-                                <path
-                                  stroke='currentColor'
-                                  strokeLinecap='round'
-                                  strokeLinejoin='round'
-                                  strokeWidth='2'
-                                  d='M13 13h3a3 3 0 0 0 0-6h-.025A5.56 5.56 0 0 0 16 6.5 5.5 5.5 0 0 0 5.207 5.021C5.137 5.017 5.071 5 5 5a4 4 0 0 0 0 8h2.167M10 15V6m0 0L8 8m2-2 2 2'
-                                />
-                              </svg>
-                              <p className='mb-2 text-sm text-gray-500 text-center'>
-                                <span className='font-semibold'>
-                                  Click to upload
-                                </span>{' '}
-                                <br /> or drag and drop
-                              </p>
-                              <p className='text-xs text-gray-500'>
-                                PNG, JPG (MAX. 5MB)
-                              </p>
-                            </div>
-                          )}
-                          <input
-                            id='dropzone-file'
-                            type='file'
-                            className='hidden'
-                            accept='image/*'
-                            onChange={handleImageChange}
-                          />
-                        </label>
-                      </div>
                       <div className='my-4 space-y-4'>
                         <div className='relative z-0'>
                           <input
@@ -226,7 +147,7 @@ export default function AddBanner({ isOpen, setIsOpen, viewOnly }) {
                         type='submit'
                         className='inline-flex justify-center rounded-md border border-transparent bg-orange-500 px-4 py-2 text-sm font-medium text-white hover:bg-orange-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 flex-1'
                       >
-                        {/* {banner ? 'Update' : 'Submit'} */} Submit
+                        {/* {notification ? 'Update' : 'Submit'} */} Submit
                       </button>
                     </div>
                   </form>

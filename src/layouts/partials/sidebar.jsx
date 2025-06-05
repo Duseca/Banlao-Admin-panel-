@@ -144,6 +144,34 @@ export default function Sidebar() {
               </li>
               <li onClick={() => handleTabClick('dashboard')}>
                 <NavLink
+                  to='/notifications'
+                  className={({ isActive, isPending }) => {
+                    return isActive
+                      ? 'flex items-center py-2 px-5 rounded-lg bg-gray-150 drop-shadow text-gray-50 font-semibold'
+                      : 'flex items-center py-2 px-5 text-gray-600 rounded-lg hover:bg-gray-150/10 drop-shadow hover:text-gray-150 hover:font-medium outline-none';
+                  }}
+                >
+                  <HiOutlineMusicalNote />
+                  <span className='flex-1 ml-3 whitespace-nowrap'>
+                    Notifications
+                  </span>
+                </NavLink>
+              </li>
+              <li onClick={() => handleTabClick('dashboard')}>
+                <NavLink
+                  to='/queries'
+                  className={({ isActive, isPending }) => {
+                    return isActive
+                      ? 'flex items-center py-2 px-5 rounded-lg bg-gray-150 drop-shadow text-gray-50 font-semibold'
+                      : 'flex items-center py-2 px-5 text-gray-600 rounded-lg hover:bg-gray-150/10 drop-shadow hover:text-gray-150 hover:font-medium outline-none';
+                  }}
+                >
+                  <HiOutlineMusicalNote />
+                  <span className='flex-1 ml-3 whitespace-nowrap'>Queries</span>
+                </NavLink>
+              </li>
+              <li onClick={() => handleTabClick('dashboard')}>
+                <NavLink
                   to='/faqs'
                   className={({ isActive, isPending }) =>
                     isActive

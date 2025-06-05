@@ -13,6 +13,8 @@ import PropertyView from './pages/PropertyView';
 import Banners from './pages/Banners';
 import Sales from './pages/Sales';
 import SaleView from './pages/SaleView';
+import UserQueries from './pages/UserQueries';
+import Notifications from './pages/Notifications';
 
 function App() {
   return (
@@ -23,6 +25,9 @@ function App() {
           <Route path='faqs' element={<Faqs />} />
           <Route path='banners' element={<Banners />} />
           <Route path='content' element={<Content />} />
+          <Route path='users' element={<Users />} />
+          <Route path='queries' element={<UserQueries />} />
+          <Route path='notifications' element={<Notifications />} />
           <Route path='users' element={<Users />} />
           <Route path='properties' element={<Properties />} />
           <Route path='sales' element={<Sales />} />

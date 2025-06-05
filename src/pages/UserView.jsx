@@ -1,6 +1,10 @@
+import { useState } from 'react';
 import Header from '../layouts/partials/header';
+import UserInfo from '../components/UserInfo';
+import UserChat from '../components/UserChat';
 
 export default function UserView() {
+  const [tab, setTab] = useState(1);
   return (
     <div>
       <Header header={'User Details'} link={'/users'} arrow={true} />
@@ -10,8 +14,21 @@ export default function UserView() {
             <div className='bg-white px-4 rounded-md'>
               <div className='flex justify-between items-center'>
                 <div className='flex items-center gap-3'>
-                  <h3 className='text-sm py-2 cursor-pointer border-b border-gray-250 font-medium'>
-                    Artist Information
+                  <h3
+                    onClick={() => setTab(1)}
+                    className={`text-sm py-2 cursor-pointer ${
+                      tab === 1 && 'border-b border-gray-250'
+                    } font-medium`}
+                  >
+                    User Information
+                  </h3>
+                  <h3
+                    onClick={() => setTab(2)}
+                    className={`text-sm py-2 cursor-pointer ${
+                      tab === 2 && 'border-b border-gray-250'
+                    } font-medium`}
+                  >
+                    User Chat
                   </h3>
                 </div>
                 <div>
@@ -21,56 +38,9 @@ export default function UserView() {
                 </div>
               </div>
             </div>
-            <div className='bg-white max-w-2xl px-4 xl:px-6 py-5'>
-              <div className='flex items-center gap-4'>
-                <div>
-                  <img
-                    className='w-16 h-16 rounded-full ring-2 ring-gray-250 object-cover border'
-                    src='https://images.pexels.com/photos/7289120/pexels-photo-7289120.jpeg?auto=compress&cs=tinysrgb&w=600'
-                    alt='users'
-                  />
-                </div>
-                <div>
-                  <h2 className='text-xl font-semibold'>Jane Doe</h2>
-                  <p className='text-xs text-gray-600'>Jane@singit.com</p>
-                </div>
-              </div>
-            </div>
-            <div className='bg-white w-full max-w-2xl'>
-              <div className='border-b px-4 xl:px-6 py-3'>
-                <div>
-                  <h5 className='uppercase text-xl font-bold'>
-                    Personal Information
-                  </h5>
-                </div>
-              </div>
-              <div className='px-4 xl:px-6 py-8 grid grid-cols-2 md:grid-cols-3 gap-y-6 gap-x-4'>
-                <div>
-                  <p className='text-xs text-gray-600'>Date of Birth</p>
-                  <h6 className='text-sm font-medium'>October 22, 2023</h6>
-                </div>
-                <div>
-                  <p className='text-xs text-gray-600'>Address</p>
-                  <h6 className='text-sm font-medium'>Florida, California</h6>
-                </div>
-                <div>
-                  <p className='text-xs text-gray-600'>Insurance</p>
-                  <h6 className='text-sm font-medium'>None</h6>
-                </div>
-                <div>
-                  <p className='text-xs text-gray-600'>Gender</p>
-                  <h6 className='text-sm font-medium'>Male</h6>
-                </div>
-                <div>
-                  <p className='text-xs text-gray-600'>Phone Number</p>
-                  <h6 className='text-sm font-medium'>+546736748565</h6>
-                </div>
-                <div>
-                  <p className='text-xs text-gray-600'>Registered On</p>
-                  <h6 className='text-sm font-medium'>October 22, 2023</h6>
-                </div>
-              </div>
-            </div>
+
+            {tab === 1 && <UserInfo />}
+            {tab === 2 && <UserChat />}
           </div>
         </div>
       </div>

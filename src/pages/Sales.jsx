@@ -3,7 +3,6 @@ import Header from '../layouts/partials/header';
 import { useState } from 'react';
 
 const Sales = () => {
-  // Sample sales/rental transaction data
   const transactionData = [
     {
       id: 1,
@@ -14,7 +13,6 @@ const Sales = () => {
       client: 'John Smith',
       agent: 'Sarah Johnson',
       date: '08/08/2023',
-      status: 'Completed',
     },
     {
       id: 2,
@@ -25,7 +23,6 @@ const Sales = () => {
       client: 'Tech Solutions Inc',
       agent: 'Michael Brown',
       date: '05/15/2023',
-      status: 'Completed',
     },
     {
       id: 3,
@@ -36,7 +33,6 @@ const Sales = () => {
       client: 'Emma Wilson',
       agent: 'David Lee',
       date: '06/20/2023',
-      status: 'Completed',
     },
     {
       id: 4,
@@ -47,7 +43,6 @@ const Sales = () => {
       client: 'Alex Taylor',
       agent: 'Jessica Chen',
       date: '07/10/2023',
-      status: 'Completed',
     },
     {
       id: 5,
@@ -58,7 +53,6 @@ const Sales = () => {
       client: 'Robert Garcia',
       agent: 'Sarah Johnson',
       date: '04/25/2023',
-      status: 'Completed',
     },
     {
       id: 6,
@@ -69,7 +63,6 @@ const Sales = () => {
       client: 'Olivia Martinez',
       agent: 'Michael Brown',
       date: '09/01/2023',
-      status: 'Pending',
     },
     {
       id: 7,
@@ -80,7 +73,6 @@ const Sales = () => {
       client: 'Digital Marketing Co',
       agent: 'David Lee',
       date: '08/15/2023',
-      status: 'Completed',
     },
   ];
 
@@ -163,13 +155,13 @@ const Sales = () => {
                       Property Type
                     </th>
                     <th scope='col' className='px-6 py-3'>
+                      Amount
+                    </th>
+                    <th scope='col' className='px-6 py-3'>
                       Client
                     </th>
                     <th scope='col' className='px-6 py-3'>
                       Agent
-                    </th>
-                    <th scope='col' className='px-6 py-3'>
-                      Status
                     </th>
                     <th scope='col' className='px-6 py-3'>
                       Date
@@ -203,17 +195,6 @@ const Sales = () => {
                       </td>
                       <td className='px-6 py-4'>{transaction.client}</td>
                       <td className='px-6 py-4'>{transaction.agent}</td>
-                      <td className='px-6 py-4'>
-                        <span
-                          className={`px-2 py-1 rounded-full text-xs ${
-                            transaction.status === 'Completed'
-                              ? 'bg-green-100 text-green-800'
-                              : 'bg-yellow-100 text-yellow-800'
-                          }`}
-                        >
-                          {transaction.status}
-                        </span>
-                      </td>
                       <td className='px-6 py-4'>{transaction.date}</td>
                       <td className='px-6 py-4 space-x-2'>
                         <Link

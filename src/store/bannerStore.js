@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { toast } from 'react-toastify';
 import supabase from '../config/supabaseClient';
+import { uploadFileToSupabase } from '../utils/storageFunctions';
 
 const initialValues = {
   banners: [],
@@ -28,14 +29,22 @@ const useBannerStore = create((set, get) => ({
   addBanner: async (bannerData) => {
     set({ isLoading: true });
     try {
-      // Prepare the data based on discount type
+      if (bannerData.imageFile) {
+        let imageUrl = '';
+        if (imageFile) {
+          const filePath = `${Date.now()}-${imageFile.name}`;
+          imageUrl = await uploadFileToSupabase(
+            filePath,
+            bannerData.imageFile,
+            'banner-images',
+            supabase
+          );
+        }
+      }
       const payload = {
         title: bannerData.title,
         description: bannerData.description,
-        howToApply: bannerData.howToApply,
-        type: bannerData.type,
-        price: bannerData.type === 'fixed' ? bannerData.price : null,
-        discount: bannerData.type === 'percentage' ? bannerData.discount : null,
+        image: imageUrl,
       };
 
       const { data, error } = await supabase
