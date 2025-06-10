@@ -2,13 +2,14 @@ import React, { useState, Fragment, useEffect } from 'react';
 import { Dialog, Transition } from '@headlessui/react';
 import { RxCross2, RxUpload } from 'react-icons/rx';
 import { toast } from 'react-toastify';
+import { useNotificationStore } from '../store';
 
 export default function AddNotification({ isOpen, setIsOpen, viewOnly }) {
   const [formData, setFormData] = useState({
     title: '',
-    description: '',
+    message: '',
   });
-  // const { notification, createNotification, updateNotification, isLoading } = useNotificationStore();
+  const { addNotification, isLoading } = useNotificationStore();
 
   const onChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -19,17 +20,12 @@ export default function AddNotification({ isOpen, setIsOpen, viewOnly }) {
     try {
       const finalForm = {
         title: formData.title,
-        description: formData.description,
+        message: formData.message,
       };
-      // if (notification) {
-      //   updateNotification(notification.id, finalForm);
-      //   toast.success('Notification Updated Successfuly');
-      // } else {
-      //   await createNotification(finalForm);
-      //   toast.success('Notification Created Successfuly');
-      // }
-      // resetForm();
-      // closeModal();
+      await addNotification(finalForm);
+      toast.success('Notification Created Successfuly');
+      resetForm();
+      closeModal();
     } catch (error) {
       toast.error(error.message);
     }
@@ -38,24 +34,13 @@ export default function AddNotification({ isOpen, setIsOpen, viewOnly }) {
   const resetForm = () => {
     setFormData({
       title: '',
-      description: '',
+      message: '',
     });
   };
 
   function closeModal() {
     setIsOpen(false);
   }
-
-  // useEffect(() => {
-  //   if (notification) {
-  //     setFormData({
-  //       title: notification.title,
-  //       description: notification.description,
-  //     });
-  //   } else {
-  //     resetForm();
-  //   }
-  // }, [notification]);
 
   return (
     <div>
@@ -89,7 +74,6 @@ export default function AddNotification({ isOpen, setIsOpen, viewOnly }) {
                     as='h3'
                     className='text-lg font-medium leading-6 text-gray-900'
                   >
-                    {/* {notification ? 'Edit Notification' : 'Add Notification'} */}{' '}
                     Add Notification
                   </Dialog.Title>
                   <form onSubmit={onSubmit}>
@@ -116,20 +100,20 @@ export default function AddNotification({ isOpen, setIsOpen, viewOnly }) {
                         <div className='relative z-0'>
                           <textarea
                             type='text'
-                            id='description-input'
+                            id='message-input'
                             className='block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-blue-600 peer'
                             placeholder=' '
-                            name='description'
-                            value={formData.description}
+                            name='message'
+                            value={formData.message}
                             onChange={onChange}
                             rows={3}
                             required
                           />
                           <label
-                            htmlFor='description-input'
+                            htmlFor='message-input'
                             className='absolute text-sm text-gray-500 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:left-0 peer-focus:text-blue-600 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6'
                           >
-                            Description
+                            Message
                           </label>
                         </div>
                       </div>
@@ -147,7 +131,7 @@ export default function AddNotification({ isOpen, setIsOpen, viewOnly }) {
                         type='submit'
                         className='inline-flex justify-center rounded-md border border-transparent bg-orange-500 px-4 py-2 text-sm font-medium text-white hover:bg-orange-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 flex-1'
                       >
-                        {/* {notification ? 'Update' : 'Submit'} */} Submit
+                        {isLoading ? '...Adding' : 'Submit'}
                       </button>
                     </div>
                   </form>

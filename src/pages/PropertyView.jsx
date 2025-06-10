@@ -1,29 +1,16 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { FiArrowLeft, FiZoomIn, FiX } from 'react-icons/fi';
 import Header from '../layouts/partials/header';
+import { useLocation } from 'react-router-dom';
+import { usePropertyStore } from '../store';
 
 export default function PropertyView() {
+  const stateProperty = useLocation().state;
+
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedImage, setSelectedImage] = useState('');
-
-  const property = {
-    title: 'Modern Luxury Villa',
-    description:
-      'This stunning modern villa offers breathtaking ocean views, spacious living areas, and high-end finishes throughout. Located in a prestigious neighborhood, the property features a gourmet kitchen, infinity pool, and smart home technology.',
-    type: 'sale',
-    price: '$1,250,000',
-    location: 'Malibu, California',
-    bedrooms: 4,
-    bathrooms: 3.5,
-    area: '3200 sqft',
-    images: [
-      'https://images.pexels.com/photos/106399/pexels-photo-106399.jpeg',
-      'https://images.pexels.com/photos/323780/pexels-photo-323780.jpeg',
-      'https://images.pexels.com/photos/1396122/pexels-photo-1396122.jpeg',
-      'https://images.pexels.com/photos/259588/pexels-photo-259588.jpeg',
-      'https://images.pexels.com/photos/164558/pexels-photo-164558.jpeg',
-    ],
-  };
+  const [property, setProperty] = useState(null);
+  const { blockProperty } = usePropertyStore();
 
   const openModal = (image) => {
     setSelectedImage(image);
@@ -36,9 +23,28 @@ export default function PropertyView() {
     document.body.style.overflow = 'auto'; // Re-enable scrolling
   };
 
+  const handleBlockProperty = async () => {
+    if (!property) return;
+    try {
+      const updatedProperty = await blockProperty(
+        property.id,
+        property.isBlocked
+      );
+      setProperty(updatedProperty);
+    } catch (error) {
+      console.error('Error blocking/unblocking property:', error);
+    }
+  };
+
+  useEffect(() => {
+    if (stateProperty) {
+      setProperty(stateProperty);
+    }
+  }, [stateProperty]);
+
   return (
     <div>
-      <Header header={'Property Details'} link={'/properties'} arrow={true} />
+      <Header header={'Property? Details'} link={'/properties'} arrow={true} />
       <div className='max-w-screen-2xl mx-auto'>
         <div className='mx-4 sm:mx-9 my-3'>
           <div className='space-y-1.5'>
@@ -49,7 +55,18 @@ export default function PropertyView() {
                     Property Information
                   </h3>
                 </div>
-                <div></div>
+                <div>
+                  <button
+                    onClick={handleBlockProperty}
+                    className={`px-5 py-1 border text-sm rounded-md font-semibold ${
+                      property?.isBlocked
+                        ? 'bg-green-500 text-white'
+                        : 'text-gray-250'
+                    }`}
+                  >
+                    {property?.isBlocked ? 'Unblock' : 'Block'}
+                  </button>
+                </div>
               </div>
             </div>
 
@@ -57,23 +74,26 @@ export default function PropertyView() {
               <div className='relative'>
                 <img
                   className='w-full h-64 md:h-80 rounded-lg object-cover'
-                  src={property.images[0]}
+                  src={property?.images[0]}
                   alt='property main'
+                  loading='lazy'
                 />
                 <button
-                  onClick={() => openModal(property.images[0])}
+                  onClick={() => openModal(property?.images[0])}
                   className='absolute bottom-4 right-4 bg-white p-2 rounded-full shadow-md hover:bg-gray-100 transition'
                 >
                   <FiZoomIn className='text-gray-700' />
                 </button>
               </div>
-              <h2 className='text-2xl font-semibold mt-4'>{property.title}</h2>
-              <p className='text-gray-600 mt-2'>{property.location}</p>
+              <h2 className='text-2xl font-semibold mt-4'>{property?.title}</h2>
+              <p className='text-gray-600 mt-2'>{property?.location}</p>
               <div className='flex items-center mt-2'>
                 <span className='bg-blue-100 text-blue-800 text-xs font-semibold px-2.5 py-0.5 rounded'>
-                  {property.type === 'sale' ? 'For Sale' : 'For Rent'}
+                  {property?.type === 'sale' ? 'For Sale' : 'For Rent'}
                 </span>
-                <span className='ml-2 text-xl font-bold'>{property.price}</span>
+                <span className='ml-2 text-xl font-bold'>
+                  {property?.price}
+                </span>
               </div>
             </div>
 
@@ -81,36 +101,36 @@ export default function PropertyView() {
               <div className='border-b px-4 xl:px-6 py-3'>
                 <div>
                   <h5 className='uppercase text-xl font-bold'>
-                    Property Details
+                    Property? Details
                   </h5>
                 </div>
               </div>
               <div className='px-4 xl:px-6 py-8 grid grid-cols-2 md:grid-cols-3 gap-y-6 gap-x-4'>
                 <div>
                   <p className='text-xs text-gray-600'>Bedrooms</p>
-                  <h6 className='text-sm font-medium'>{property.bedrooms}</h6>
+                  <h6 className='text-sm font-medium'>{property?.bedrooms}</h6>
                 </div>
                 <div>
                   <p className='text-xs text-gray-600'>Bathrooms</p>
-                  <h6 className='text-sm font-medium'>{property.bathrooms}</h6>
+                  <h6 className='text-sm font-medium'>{property?.bathrooms}</h6>
                 </div>
                 <div>
                   <p className='text-xs text-gray-600'>Area</p>
-                  <h6 className='text-sm font-medium'>{property.area}</h6>
+                  <h6 className='text-sm font-medium'>{property?.area}</h6>
                 </div>
                 <div>
                   <p className='text-xs text-gray-600'>Type</p>
                   <h6 className='text-sm font-medium capitalize'>
-                    {property.type}
+                    {property?.type}
                   </h6>
                 </div>
                 <div>
                   <p className='text-xs text-gray-600'>Price</p>
-                  <h6 className='text-sm font-medium'>{property.price}</h6>
+                  <h6 className='text-sm font-medium'>{property?.price}</h6>
                 </div>
                 <div>
                   <p className='text-xs text-gray-600'>Location</p>
-                  <h6 className='text-sm font-medium'>{property.location}</h6>
+                  <h6 className='text-sm font-medium'>{property?.location}</h6>
                 </div>
               </div>
             </div>
@@ -122,7 +142,7 @@ export default function PropertyView() {
                 </div>
               </div>
               <div className='px-4 xl:px-6 py-8'>
-                <p className='text-gray-700'>{property.description}</p>
+                <p className='text-gray-700'>{property?.description}</p>
               </div>
             </div>
 
@@ -133,7 +153,7 @@ export default function PropertyView() {
                 </div>
               </div>
               <div className='px-4 xl:px-6 py-8 grid grid-cols-2 md:grid-cols-3 gap-4'>
-                {property.images.map((image, index) => (
+                {property?.images?.map((image, index) => (
                   <div
                     key={index}
                     className='relative group cursor-pointer'
@@ -142,7 +162,8 @@ export default function PropertyView() {
                     <img
                       className='w-full h-32 object-cover rounded-lg'
                       src={image}
-                      alt={`property ${index + 1}`}
+                      alt={`property? ${index + 1}`}
+                      loading='lazy'
                     />
                     <div className='absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition flex items-center justify-center rounded-lg'>
                       <FiZoomIn className='text-white opacity-0 group-hover:opacity-100 transition text-2xl' />
@@ -172,7 +193,7 @@ export default function PropertyView() {
 
             <img
               src={selectedImage}
-              alt='property full view'
+              alt='property? full view'
               className='w-full max-h-[90vh] object-contain rounded-lg'
             />
           </div>

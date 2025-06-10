@@ -30,7 +30,7 @@ const useNotificationStore = create((set, get) => ({
     try {
       const payload = {
         title: notificationData.title,
-        description: notificationData.description,
+        message: notificationData.message,
       };
 
       const { data, error } = await supabase

@@ -1,7 +1,52 @@
 import { Link } from 'react-router-dom';
 import Header from '../layouts/partials/header';
+import { useState, useEffect } from 'react';
+import ReactPaginate from 'react-paginate';
+import Spinner from '../components/Spinner';
+import { useUserStore } from '../store';
 
 export default function Users() {
+  const { isLoading, users, fetchUsers } = useUserStore();
+  const [originalUsers, setOriginalUsers] = useState([]);
+  const [search, setSearch] = useState('');
+
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage] = useState(20);
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  let currentUsers = originalUsers?.slice(indexOfFirstItem, indexOfLastItem);
+
+  const paginate = ({ selected }) => {
+    setCurrentPage(selected + 1);
+  };
+
+  const searchUsers = () => {
+    if (search === '') {
+      setOriginalUsers(users);
+    } else {
+      const filteredUsers = originalUsers.filter(
+        (user) =>
+          user.name?.toLowerCase().includes(search.toLowerCase()) ||
+          user.email?.toLowerCase().includes(search.toLowerCase())
+      );
+      setOriginalUsers(filteredUsers);
+    }
+  };
+
+  useEffect(() => {
+    searchUsers();
+  }, [search]);
+
+  useEffect(() => {
+    fetchUsers();
+  }, []);
+
+  useEffect(() => {
+    if (users.length > 0) {
+      setOriginalUsers(users);
+    }
+  }, [users]);
+
   return (
     <div>
       <Header header={'Manage Users'} />
@@ -33,6 +78,7 @@ export default function Users() {
                   id='default-search'
                   className='block w-full px-4 py-2 outline-none pl-10 text-sm text-gray-900 border border-gray-300 rounded-full focus:ring-blue-500 focus:border-blue-500'
                   placeholder='Search users...'
+                  onChange={() => setSearch(e.target.value)}
                   required
                 />
               </div>
@@ -45,61 +91,94 @@ export default function Users() {
             </div>
           </div>
           <div className='my-3'>
-            <div className='relative overflow-x-auto drop-shadow-xl bg-white sm:rounded-lg'>
-              <table className='w-full text-sm text-left text-gray-500'>
-                <thead className='text-xs text-gray-700 uppercase border-b-2 bg-white'>
-                  <tr>
-                    <th scope='col' className='px-6 py-3'>
-                      name
-                    </th>
-                    <th scope='col' className='px-6 py-3'>
-                      email
-                    </th>
-                    <th scope='col' className='px-6 py-3'>
-                      Phn. No
-                    </th>
-                    <th scope='col' className='px-6 py-3'>
-                      location
-                    </th>
-                    <th scope='col' className='px-6 py-3'>
-                      Date
-                    </th>
-                    <th scope='col' className='px-6 py-3'>
-                      Actions
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {[...Array(7)].map((x, i) => (
-                    <tr className='bg-white border-b hover:bg-gray-150/30'>
-                      <td className='px-6 py-4 whitespace-nowrap'>
-                        <div className='flex items-center space-x-2'>
-                          <img
-                            src='https://images.pexels.com/photos/5384445/pexels-photo-5384445.jpeg?auto=compress&cs=tinysrgb&w=1600'
-                            alt='pizza'
-                            className='w-8 h-8 rounded-full object-cover'
-                          />
-                          <h1 className=''>John Doe</h1>
-                        </div>
-                      </td>
-                      <td className='px-6 py-4'>john@student.com</td>
-                      <td className='px-6 py-4'>(123)-4567890</td>
-                      <td className='px-6 py-4'>Netherlands</td>
-                      <td className='px-6 py-4'>08/08/2025</td>
-                      <td className='px-6 py-4 space-x-2'>
-                        <Link
-                          to='/users/view'
-                          className='font-medium text-gray-150 bg-gray-150 px-3 py-0.5 rounded-md hover:text-gray-250 bg-opacity-10'
-                        >
-                          View
-                        </Link>
-                        {/* <a href="#" className="font-medium text-gray-250 hover:text-gray-150 hover:underline">Block</a> */}
-                      </td>
+            {isLoading ? (
+              <div className='flex w-full h-full'>
+                <Spinner />
+              </div>
+            ) : (
+              <div className='relative overflow-x-auto drop-shadow-xl bg-white sm:rounded-lg'>
+                <table className='w-full text-sm text-left text-gray-500'>
+                  <thead className='text-xs text-gray-700 uppercase border-b-2 bg-white'>
+                    <tr>
+                      <th scope='col' className='px-6 py-3'>
+                        name
+                      </th>
+                      <th scope='col' className='px-6 py-3'>
+                        email
+                      </th>
+                      <th scope='col' className='px-6 py-3'>
+                        Phn. No
+                      </th>
+                      <th scope='col' className='px-6 py-3'>
+                        location
+                      </th>
+                      <th scope='col' className='px-6 py-3'>
+                        Date
+                      </th>
+                      <th scope='col' className='px-6 py-3'>
+                        Actions
+                      </th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+                  </thead>
+                  <tbody>
+                    {currentUsers.map((user) => (
+                      <tr
+                        key={user.id}
+                        className='bg-white border-b hover:bg-gray-150/30'
+                      >
+                        <td className='px-6 py-4 whitespace-nowrap'>
+                          <div className='flex items-center space-x-2'>
+                            <img
+                              src={user.profileImage}
+                              alt='user'
+                              className='w-8 h-8 rounded-full object-cover'
+                            />
+                            <h1 className=''>{user.name || 'N/A'}</h1>
+                          </div>
+                        </td>
+                        <td className='px-6 py-4'>{user.email || 'N/A'}</td>
+                        <td className='px-6 py-4'>{user.phoneNo || 'N/A'}</td>
+                        <td className='px-6 py-4'>{user.location || 'N/A'}</td>
+                        <td className='px-6 py-4'>
+                          {(user.created_at &&
+                            new Date(user.created_at).toDateString()) ||
+                            'N/A'}
+                        </td>
+                        <td className='px-6 py-4 space-x-2'>
+                          <Link
+                            to='/users/view'
+                            state={{ ...user }}
+                            className='font-medium text-gray-150 bg-gray-150 px-3 py-0.5 rounded-md hover:text-gray-250 bg-opacity-10'
+                          >
+                            View
+                          </Link>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+                {users.length > itemsPerPage && (
+                  <div className='py-4 px-4 flex items-start justify-center'>
+                    <ReactPaginate
+                      onPageChange={paginate}
+                      pageCount={Math.ceil(users?.length / itemsPerPage)}
+                      previousLabel={'⮜'}
+                      nextLabel={'⮞'}
+                      breakLabel={'...'}
+                      marginPagesDisplayed={2}
+                      pageRangeDisplayed={2}
+                      containerClassName='flex space-x-2'
+                      breakLinkClassName='bg-gray-150 px-3 py-0.5 border border-gray-250 border-opacity-10 rounded-md hover:text-gray-250 bg-opacity-20 text-gray-900'
+                      pageLinkClassName='bg-gray-150 px-3 py-0.5 border border-gray-250 border-opacity-10 rounded-md hover:text-gray-250 bg-opacity-20 text-gray-900'
+                      previousLinkClassName='bg-gray-150 px-3 py-0.5 border border-gray-250 border-opacity-10 rounded-md hover:text-gray-250 bg-opacity-20 text-gray-900'
+                      nextLinkClassName='bg-gray-150 px-3 py-0.5 border border-gray-250 border-opacity-10 rounded-md hover:text-gray-250 bg-opacity-20 text-gray-900'
+                      activeLinkClassName='bg-orange-250 px-3 py-0.5 border border-gray-250 border-opacity-10 rounded-md text-gray-900 font-bold shadow-md hover:text-gray-250'
+                      disabledLinkClassName='bg-slate-800 px-3 py-0.5 border border-gray-250 border-opacity-10 rounded-md text-gray-500'
+                    />
+                  </div>
+                )}
+              </div>
+            )}
           </div>
         </div>
       </div>

@@ -1,8 +1,52 @@
 import { Link } from 'react-router-dom';
 import Header from '../layouts/partials/header';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import ReactPaginate from 'react-paginate';
+import Spinner from '../components/Spinner';
+import { useSaleStore } from '../store';
 
 const Sales = () => {
+  const { isLoading, sales, fetchSales } = useSaleStore();
+  const [originalSales, setOriginalSales] = useState([]);
+  const [search, setSearch] = useState('');
+
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage] = useState(20);
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  let currentSales = originalSales?.slice(indexOfFirstItem, indexOfLastItem);
+
+  const paginate = ({ selected }) => {
+    setCurrentPage(selected + 1);
+  };
+
+  const searchSales = () => {
+    if (search === '') {
+      setOriginalSales(sales);
+    } else {
+      const filteredSales = originalSales.filter(
+        (sale) =>
+          sale.name?.toLowerCase().includes(search.toLowerCase()) ||
+          sale.email?.toLowerCase().includes(search.toLowerCase())
+      );
+      setOriginalSales(filteredSales);
+    }
+  };
+
+  useEffect(() => {
+    searchSales();
+  }, [search]);
+
+  useEffect(() => {
+    fetchSales();
+  }, []);
+
+  useEffect(() => {
+    if (sales.length > 0) {
+      setOriginalSales(sales);
+    }
+  }, [sales]);
+
   const transactionData = [
     {
       id: 1,
@@ -119,6 +163,7 @@ const Sales = () => {
                   id='default-search'
                   className='block w-full px-4 py-2 outline-none pl-10 text-sm text-gray-900 border border-gray-300 rounded-full focus:ring-blue-500 focus:border-blue-500'
                   placeholder='Search transactions...'
+                  onChange={() => setSearch(e.target.value)}
                   required
                 />
               </div>
@@ -141,74 +186,101 @@ const Sales = () => {
             </div>
           </div>
           <div className='my-3'>
-            <div className='relative overflow-x-auto drop-shadow-xl bg-white sm:rounded-lg'>
-              <table className='w-full text-sm text-left text-gray-500'>
-                <thead className='text-xs text-gray-700 uppercase border-b-2 bg-white'>
-                  <tr>
-                    <th scope='col' className='px-6 py-3'>
-                      Property
-                    </th>
-                    <th scope='col' className='px-6 py-3'>
-                      Transaction Type
-                    </th>
-                    <th scope='col' className='px-6 py-3'>
-                      Property Type
-                    </th>
-                    <th scope='col' className='px-6 py-3'>
-                      Amount
-                    </th>
-                    <th scope='col' className='px-6 py-3'>
-                      Client
-                    </th>
-                    <th scope='col' className='px-6 py-3'>
-                      Agent
-                    </th>
-                    <th scope='col' className='px-6 py-3'>
-                      Date
-                    </th>
-                    <th scope='col' className='px-6 py-3'>
-                      Actions
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {filteredTransactions.map((transaction) => (
-                    <tr
-                      key={transaction.id}
-                      className='bg-white border-b hover:bg-gray-150/30'
-                    >
-                      <td className='px-6 py-4 whitespace-nowrap'>
-                        <h1 className='font-medium'>
-                          {transaction.propertyName}
-                        </h1>
-                      </td>
-                      <td className='px-6 py-4'>
-                        {transaction.transactionType}
-                      </td>
-                      <td className='px-6 py-4'>{transaction.propertyType}</td>
-                      <td className='px-6 py-4'>
-                        <div className='flex flex-col'>
-                          <span className='font-semibold'>
-                            {transaction.price}
-                          </span>
-                        </div>
-                      </td>
-                      <td className='px-6 py-4'>{transaction.client}</td>
-                      <td className='px-6 py-4'>{transaction.agent}</td>
-                      <td className='px-6 py-4'>{transaction.date}</td>
-                      <td className='px-6 py-4 space-x-2'>
-                        <Link
-                          to={`/sale/view`}
-                          className='font-medium text-gray-150 bg-gray-150 px-3 py-0.5 rounded-md hover:text-gray-250 bg-opacity-10'
-                        >
-                          View
-                        </Link>
-                      </td>
+            {isLoading ? (
+              <div className='flex w-full h-full'>
+                <Spinner />
+              </div>
+            ) : (
+              <div className='relative overflow-x-auto drop-shadow-xl bg-white sm:rounded-lg'>
+                <table className='w-full text-sm text-left text-gray-500'>
+                  <thead className='text-xs text-gray-700 uppercase border-b-2 bg-white'>
+                    <tr>
+                      <th scope='col' className='px-6 py-3'>
+                        Property
+                      </th>
+                      <th scope='col' className='px-6 py-3'>
+                        Transaction Type
+                      </th>
+                      <th scope='col' className='px-6 py-3'>
+                        Property Type
+                      </th>
+                      <th scope='col' className='px-6 py-3'>
+                        Amount
+                      </th>
+                      <th scope='col' className='px-6 py-3'>
+                        Client
+                      </th>
+                      <th scope='col' className='px-6 py-3'>
+                        Agent
+                      </th>
+                      <th scope='col' className='px-6 py-3'>
+                        Date
+                      </th>
+                      <th scope='col' className='px-6 py-3'>
+                        Actions
+                      </th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+                  </thead>
+                  <tbody>
+                    {currentSales.map((sale) => (
+                      <tr
+                        key={sale.id}
+                        className='bg-white border-b hover:bg-gray-150/30'
+                      >
+                        <td className='px-6 py-4 whitespace-nowrap'>
+                          <h1 className='font-medium'>
+                            {sale.propertyName || 'N/A'}
+                          </h1>
+                        </td>
+                        <td className='px-6 py-4'>{sale.saleType || 'N/A'}</td>
+                        <td className='px-6 py-4'>
+                          {sale.propertyType || 'N/A'}
+                        </td>
+                        <td className='px-6 py-4'>
+                          <div className='flex flex-col'>
+                            <span className='font-semibold'>
+                              {sale.price || 'N/A'}
+                            </span>
+                          </div>
+                        </td>
+                        <td className='px-6 py-4'>{sale.client || 'N/A'}</td>
+                        <td className='px-6 py-4'>{sale.agent || 'N/A'}</td>
+                        <td className='px-6 py-4'>{sale.date || 'N/A'}</td>
+                        <td className='px-6 py-4 space-x-2'>
+                          <Link
+                            to={`/sale/view`}
+                            state={{ ...sale }}
+                            className='font-medium text-gray-150 bg-gray-150 px-3 py-0.5 rounded-md hover:text-gray-250 bg-opacity-10'
+                          >
+                            View
+                          </Link>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+                {sales.length > itemsPerPage && (
+                  <div className='py-4 px-4 flex items-start justify-center'>
+                    <ReactPaginate
+                      onPageChange={paginate}
+                      pageCount={Math.ceil(sales?.length / itemsPerPage)}
+                      previousLabel={'⮜'}
+                      nextLabel={'⮞'}
+                      breakLabel={'...'}
+                      marginPagesDisplayed={2}
+                      pageRangeDisplayed={2}
+                      containerClassName='flex space-x-2'
+                      breakLinkClassName='bg-gray-150 px-3 py-0.5 border border-gray-250 border-opacity-10 rounded-md hover:text-gray-250 bg-opacity-20 text-gray-900'
+                      pageLinkClassName='bg-gray-150 px-3 py-0.5 border border-gray-250 border-opacity-10 rounded-md hover:text-gray-250 bg-opacity-20 text-gray-900'
+                      previousLinkClassName='bg-gray-150 px-3 py-0.5 border border-gray-250 border-opacity-10 rounded-md hover:text-gray-250 bg-opacity-20 text-gray-900'
+                      nextLinkClassName='bg-gray-150 px-3 py-0.5 border border-gray-250 border-opacity-10 rounded-md hover:text-gray-250 bg-opacity-20 text-gray-900'
+                      activeLinkClassName='bg-orange-250 px-3 py-0.5 border border-gray-250 border-opacity-10 rounded-md text-gray-900 font-bold shadow-md hover:text-gray-250'
+                      disabledLinkClassName='bg-slate-800 px-3 py-0.5 border border-gray-250 border-opacity-10 rounded-md text-gray-500'
+                    />
+                  </div>
+                )}
+              </div>
+            )}
           </div>
         </div>
       </div>

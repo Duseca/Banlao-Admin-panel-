@@ -26,61 +26,39 @@ const useBannerStore = create((set, get) => ({
     }
   },
 
-  addBanner: async (bannerData) => {
+  editBanner: async (bannerData, id) => {
     set({ isLoading: true });
     try {
+      let imageUrl = bannerData.image;
       if (bannerData.imageFile) {
-        let imageUrl = '';
-        if (imageFile) {
-          const filePath = `${Date.now()}-${imageFile.name}`;
-          imageUrl = await uploadFileToSupabase(
-            filePath,
-            bannerData.imageFile,
-            'banner-images',
-            supabase
-          );
+        if (bannerData.image) {
+          try {
+            const oldImagePath = bannerData.image.split(
+              '/storage/v1/object/public/banner-images/'
+            )[1];
+            await deleteFileFromSupabase(
+              oldImagePath,
+              'banner-images',
+              supabase
+            );
+          } catch (error) {
+            console.error('Failed to delete old image:', error);
+          }
         }
+
+        const filePath = `${Date.now()}-${bannerData.imageFile.name}`;
+        imageUrl = await uploadFileToSupabase(
+          filePath,
+          bannerData.imageFile,
+          'banner-images',
+          supabase
+        );
       }
+
       const payload = {
         title: bannerData.title,
         description: bannerData.description,
         image: imageUrl,
-      };
-
-      const { data, error } = await supabase
-        .from('banners')
-        .insert([payload])
-        .select();
-
-      if (error) throw error;
-
-      set((state) => ({
-        banners: [...state.banners, data[0]],
-        isLoading: false,
-      }));
-
-      toast.success('Banner added successfully!');
-      return data[0]; // Return the new banner
-    } catch (error) {
-      toast.error(error.message);
-      console.error(error);
-      throw error;
-    } finally {
-      set({ isLoading: false });
-    }
-  },
-
-  editBanner: async (bannerData, id) => {
-    set({ isLoading: true });
-    try {
-      // Prepare the data based on discount type
-      const payload = {
-        title: bannerData.title,
-        description: bannerData.description,
-        howToApply: bannerData.howToApply,
-        type: bannerData.type,
-        price: bannerData.type === 'fixed' ? bannerData.price : null,
-        discount: bannerData.type === 'percentage' ? bannerData.discount : null,
       };
 
       const { data, error } = await supabase
@@ -110,15 +88,28 @@ const useBannerStore = create((set, get) => ({
     }
   },
 
-  removeBanner: async (id) => {
+  removeBanner: async (banner) => {
     set({ isLoading: true });
     try {
-      const { error } = await supabase.from('banners').delete().eq('id', id);
+      if (banner.image) {
+        try {
+          const imagePath = banner.image.split(
+            '/storage/v1/object/public/banner-images/'
+          )[1];
+          await deleteFileFromSupabase(imagePath, 'banner-images', supabase);
+        } catch (error) {
+          console.error('Failed to delete banner image:', error);
+        }
+      }
 
+      const { error } = await supabase
+        .from('banners')
+        .delete()
+        .eq('id', banner.id);
       if (error) throw error;
 
       set((state) => ({
-        banners: state.banners.filter((banner) => banner.id !== id),
+        banners: state.banners.filter((b) => b.id !== banner.id),
       }));
       toast.success('Banner removed successfully!');
     } catch (error) {

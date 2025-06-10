@@ -1,10 +1,32 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Header from '../layouts/partials/header';
 import UserInfo from '../components/UserInfo';
 import UserChat from '../components/UserChat';
+import { useLocation } from 'react-router-dom';
+import { useUserStore } from '../store';
 
 export default function UserView() {
   const [tab, setTab] = useState(1);
+  const { id } = useLocation();
+  const stateUser = useLocation().state;
+  const [user, setUser] = useState(null);
+  const { blockUser } = useUserStore();
+
+  useEffect(() => {
+    if (stateUser) {
+      setUser(stateUser);
+    }
+  }, [stateUser]);
+
+  const handleBlockUser = async () => {
+    try {
+      const updatedUser = await blockUser(user.id, user.isBlocked);
+      setUser(updatedUser);
+    } catch (error) {
+      console.error('Error blocking/unblocking user:', error);
+    }
+  };
+
   return (
     <div>
       <Header header={'User Details'} link={'/users'} arrow={true} />
@@ -32,14 +54,21 @@ export default function UserView() {
                   </h3>
                 </div>
                 <div>
-                  <button className='px-5 py-1 border text-sm text-gray-250 rounded-md font-semibold'>
-                    Block
+                  <button
+                    onClick={handleBlockUser}
+                    className={`px-5 py-1 border text-sm rounded-md font-semibold ${
+                      user?.isBlocked
+                        ? 'bg-green-500 text-white'
+                        : 'text-gray-250'
+                    }`}
+                  >
+                    {user?.isBlocked ? 'Unblock' : 'Block'}
                   </button>
                 </div>
               </div>
             </div>
 
-            {tab === 1 && <UserInfo />}
+            {tab === 1 && user && <UserInfo user={user} />}
             {tab === 2 && <UserChat />}
           </div>
         </div>

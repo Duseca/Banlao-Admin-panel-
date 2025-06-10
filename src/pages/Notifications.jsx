@@ -1,10 +1,57 @@
 import { Link } from 'react-router-dom';
 import Header from '../layouts/partials/header';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import ReactPaginate from 'react-paginate';
+import Spinner from '../components/Spinner';
 import AddNotification from '../components/AddNotification';
+import { useNotificationStore } from '../store';
 
 const Notifications = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const { isLoading, notifications, fetchNotifications } =
+    useNotificationStore();
+  const [originalNotifications, setOriginalNotifications] = useState([]);
+  const [search, setSearch] = useState('');
+
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage] = useState(20);
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  let currentNotifications = originalNotifications?.slice(
+    indexOfFirstItem,
+    indexOfLastItem
+  );
+
+  const paginate = ({ selected }) => {
+    setCurrentPage(selected + 1);
+  };
+
+  const searchNotifications = () => {
+    if (search === '') {
+      setOriginalNotifications(notifications);
+    } else {
+      const filteredNotifications = originalNotifications.filter(
+        (user) =>
+          user.name?.toLowerCase().includes(search.toLowerCase()) ||
+          user.email?.toLowerCase().includes(search.toLowerCase())
+      );
+      setOriginalNotifications(filteredNotifications);
+    }
+  };
+
+  useEffect(() => {
+    searchNotifications();
+  }, [search]);
+
+  useEffect(() => {
+    fetchNotifications();
+  }, []);
+
+  useEffect(() => {
+    if (notifications.length > 0) {
+      setOriginalNotifications(notifications);
+    }
+  }, [notifications]);
 
   const notificationsList = [
     {
@@ -76,6 +123,7 @@ const Notifications = () => {
                     type='search'
                     className='block w-full px-4 py-2 pl-10 text-sm text-gray-900 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500'
                     placeholder='Search notifications...'
+                    onChange={() => setSearch(e.target.value)}
                   />
                 </div>
                 <button
@@ -89,66 +137,96 @@ const Notifications = () => {
                 </button>
               </div>
             </div>
-            <div className='overflow-x-auto'>
-              <table className='w-full text-sm text-left text-gray-500'>
-                <thead className='text-xs text-gray-700 uppercase bg-gray-50'>
-                  <tr>
-                    <th scope='col' className='px-6 py-3'>
-                      ID
-                    </th>
-                    <th scope='col' className='px-6 py-3'>
-                      Title
-                    </th>
-                    <th scope='col' className='px-6 py-3'>
-                      Message
-                    </th>
-                    <th scope='col' className='px-6 py-3'>
-                      Date
-                    </th>
-                    <th scope='col' className='px-6 py-3'>
-                      Status
-                    </th>
-                    <th scope='col' className='px-6 py-3'>
-                      Actions
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {notificationsList.map((notification) => (
-                    <tr
-                      key={notification.id}
-                      className='bg-white border-b hover:bg-gray-50'
-                    >
-                      <td className='px-6 py-4'>{notification.id}</td>
-                      <td className='px-6 py-4 font-medium text-gray-900'>
-                        {notification.title}
-                      </td>
-                      <td className='px-6 py-4'>{notification.message}</td>
-                      <td className='px-6 py-4'>{notification.date}</td>
-                      <td className='px-6 py-4'>
-                        <span
-                          className={`px-2 py-1 text-xs rounded-full ${
-                            notification.status === 'Sent'
-                              ? 'bg-green-100 text-green-800'
-                              : 'bg-yellow-100 text-yellow-800'
-                          }`}
-                        >
-                          {notification.status}
-                        </span>
-                      </td>
-                      <td className='px-6 py-4'>
-                        <button className='font-medium text-blue-600 hover:text-blue-900 mr-3'>
-                          Resend
-                        </button>
-                        <button className='font-medium text-red-600 hover:text-red-900'>
-                          Delete
-                        </button>
-                      </td>
+            {isLoading ? (
+              <div className='flex w-full h-full'>
+                <Spinner />
+              </div>
+            ) : (
+              <div className='overflow-x-auto'>
+                <table className='w-full text-sm text-left text-gray-500'>
+                  <thead className='text-xs text-gray-700 uppercase bg-gray-50'>
+                    <tr>
+                      <th scope='col' className='px-6 py-3'>
+                        ID
+                      </th>
+                      <th scope='col' className='px-6 py-3'>
+                        Title
+                      </th>
+                      <th scope='col' className='px-6 py-3'>
+                        Message
+                      </th>
+                      <th scope='col' className='px-6 py-3'>
+                        Date
+                      </th>
+                      <th scope='col' className='px-6 py-3'>
+                        Status
+                      </th>
+                      <th scope='col' className='px-6 py-3'>
+                        Actions
+                      </th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+                  </thead>
+                  <tbody>
+                    {currentNotifications.map((notification, idx) => (
+                      <tr
+                        key={notification.id}
+                        className='bg-white border-b hover:bg-gray-50'
+                      >
+                        <td className='px-6 py-4'>{idx + 1}</td>
+                        <td className='px-6 py-4 font-medium text-gray-900'>
+                          {notification.title}
+                        </td>
+                        <td className='px-6 py-4'>{notification.message}</td>
+                        <td className='px-6 py-4'>
+                          {new Date(notification.created_at).toDateString()}
+                        </td>
+                        <td className='px-6 py-4'>
+                          <span
+                            className={`px-2 py-1 text-xs rounded-full ${
+                              notification.status === 'Sent'
+                                ? 'bg-green-100 text-green-800'
+                                : 'bg-yellow-100 text-yellow-800'
+                            }`}
+                          >
+                            {notification.status}
+                          </span>
+                        </td>
+                        <td className='px-6 py-4'>
+                          <button className='font-medium text-blue-600 hover:text-blue-900 mr-3'>
+                            Resend
+                          </button>
+                          <button className='font-medium text-red-600 hover:text-red-900'>
+                            Delete
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+                {notifications.length > itemsPerPage && (
+                  <div className='py-4 px-4 flex items-start justify-center'>
+                    <ReactPaginate
+                      onPageChange={paginate}
+                      pageCount={Math.ceil(
+                        notifications?.length / itemsPerPage
+                      )}
+                      previousLabel={'⮜'}
+                      nextLabel={'⮞'}
+                      breakLabel={'...'}
+                      marginPagesDisplayed={2}
+                      pageRangeDisplayed={2}
+                      containerClassName='flex space-x-2'
+                      breakLinkClassName='bg-gray-150 px-3 py-0.5 border border-gray-250 border-opacity-10 rounded-md hover:text-gray-250 bg-opacity-20 text-gray-900'
+                      pageLinkClassName='bg-gray-150 px-3 py-0.5 border border-gray-250 border-opacity-10 rounded-md hover:text-gray-250 bg-opacity-20 text-gray-900'
+                      previousLinkClassName='bg-gray-150 px-3 py-0.5 border border-gray-250 border-opacity-10 rounded-md hover:text-gray-250 bg-opacity-20 text-gray-900'
+                      nextLinkClassName='bg-gray-150 px-3 py-0.5 border border-gray-250 border-opacity-10 rounded-md hover:text-gray-250 bg-opacity-20 text-gray-900'
+                      activeLinkClassName='bg-orange-250 px-3 py-0.5 border border-gray-250 border-opacity-10 rounded-md text-gray-900 font-bold shadow-md hover:text-gray-250'
+                      disabledLinkClassName='bg-slate-800 px-3 py-0.5 border border-gray-250 border-opacity-10 rounded-md text-gray-500'
+                    />
+                  </div>
+                )}
+              </div>
+            )}
           </div>
         </div>
       </div>

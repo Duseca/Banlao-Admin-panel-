@@ -2,6 +2,7 @@ import React, { useState, Fragment, useEffect } from 'react';
 import { Dialog, Transition } from '@headlessui/react';
 import { RxCross2, RxUpload } from 'react-icons/rx';
 import { toast } from 'react-toastify';
+import { useBannerStore } from '../store';
 
 export default function AddBanner({ isOpen, setIsOpen, viewOnly }) {
   const [formData, setFormData] = useState({
@@ -11,7 +12,7 @@ export default function AddBanner({ isOpen, setIsOpen, viewOnly }) {
     imageFile: null,
     imagePreview: null,
   });
-  // const { banner, createBanner, updateBanner, isLoading } = useBannerStore();
+  const { banner, addBanner, editBanner, isLoading } = useBannerStore();
 
   const onChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -40,15 +41,15 @@ export default function AddBanner({ isOpen, setIsOpen, viewOnly }) {
         description: formData.description,
         imageFile: formData.imageFile,
       };
-      // if (banner) {
-      //   updateBanner(banner.id, finalForm);
-      //   toast.success('Banner Updated Successfuly');
-      // } else {
-      //   await createBanner(finalForm);
-      //   toast.success('Banner Created Successfuly');
-      // }
-      // resetForm();
-      // closeModal();
+      if (banner) {
+        editBanner(banner.id, finalForm);
+        toast.success('Banner Updated Successfuly');
+      } else {
+        await addBanner(finalForm);
+        toast.success('Banner Created Successfuly');
+      }
+      resetForm();
+      closeModal();
     } catch (error) {
       toast.error(error.message);
     }
@@ -68,19 +69,19 @@ export default function AddBanner({ isOpen, setIsOpen, viewOnly }) {
     setIsOpen(false);
   }
 
-  // useEffect(() => {
-  //   if (banner) {
-  //     setFormData({
-  //       title: banner.title,
-  //       description: banner.description,
-  //       image: banner.image,
-  //       imageFile: null,
-  //       imagePreview: banner.image,
-  //     });
-  //   } else {
-  //     resetForm();
-  //   }
-  // }, [banner]);
+  useEffect(() => {
+    if (banner) {
+      setFormData({
+        title: banner.title,
+        description: banner.description,
+        image: banner.image,
+        imageFile: null,
+        imagePreview: banner.image,
+      });
+    } else {
+      resetForm();
+    }
+  }, [banner]);
 
   return (
     <div>
@@ -114,7 +115,7 @@ export default function AddBanner({ isOpen, setIsOpen, viewOnly }) {
                     as='h3'
                     className='text-lg font-medium leading-6 text-gray-900'
                   >
-                    {/* {banner ? 'Edit Banner' : 'Add Banner'} */} Add Banner
+                    {banner ? 'Edit Banner' : 'Add Banner'}
                   </Dialog.Title>
                   <form onSubmit={onSubmit}>
                     <div className='mt-2'>
@@ -226,7 +227,11 @@ export default function AddBanner({ isOpen, setIsOpen, viewOnly }) {
                         type='submit'
                         className='inline-flex justify-center rounded-md border border-transparent bg-orange-500 px-4 py-2 text-sm font-medium text-white hover:bg-orange-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 flex-1'
                       >
-                        {/* {banner ? 'Update' : 'Submit'} */} Submit
+                        {banner
+                          ? 'Update'
+                          : isLoading
+                          ? '...Updating'
+                          : 'Submit'}
                       </button>
                     </div>
                   </form>

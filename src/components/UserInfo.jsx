@@ -1,6 +1,6 @@
 import React from 'react';
 
-const UserInfo = () => {
+const UserInfo = ({ user }) => {
   return (
     <div>
       <div className='bg-white max-w-2xl px-4 xl:px-6 py-5'>
@@ -8,13 +8,13 @@ const UserInfo = () => {
           <div>
             <img
               className='w-16 h-16 rounded-full ring-2 ring-gray-250 object-cover border'
-              src='https://images.pexels.com/photos/7289120/pexels-photo-7289120.jpeg?auto=compress&cs=tinysrgb&w=600'
-              alt='users'
+              src={user.profileImage}
+              alt='user'
             />
           </div>
           <div>
-            <h2 className='text-xl font-semibold'>Jane Doe</h2>
-            <p className='text-xs text-gray-600'>Jane@singit.com</p>
+            <h2 className='text-xl font-semibold'>{user.name || 'N/A'}</h2>
+            <p className='text-xs text-gray-600'>{user.email || 'N/A'}</p>
           </div>
         </div>
       </div>
@@ -28,28 +28,22 @@ const UserInfo = () => {
         </div>
         <div className='px-4 xl:px-6 py-8 grid grid-cols-2 md:grid-cols-3 gap-y-6 gap-x-4'>
           <div>
-            <p className='text-xs text-gray-600'>Date of Birth</p>
-            <h6 className='text-sm font-medium'>October 22, 2023</h6>
+            <p className='text-xs text-gray-600'>Location</p>
+            <h6 className='text-sm font-medium'>{user.location || 'N/A'}</h6>
           </div>
           <div>
             <p className='text-xs text-gray-600'>Address</p>
-            <h6 className='text-sm font-medium'>Florida, California</h6>
-          </div>
-          <div>
-            <p className='text-xs text-gray-600'>Insurance</p>
-            <h6 className='text-sm font-medium'>None</h6>
-          </div>
-          <div>
-            <p className='text-xs text-gray-600'>Gender</p>
-            <h6 className='text-sm font-medium'>Male</h6>
+            <h6 className='text-sm font-medium'>{user.address || 'N/A'}</h6>
           </div>
           <div>
             <p className='text-xs text-gray-600'>Phone Number</p>
-            <h6 className='text-sm font-medium'>+546736748565</h6>
+            <h6 className='text-sm font-medium'>{user.phoneNo || 'N/A'}</h6>
           </div>
           <div>
             <p className='text-xs text-gray-600'>Registered On</p>
-            <h6 className='text-sm font-medium'>October 22, 2023</h6>
+            <h6 className='text-sm font-medium'>
+              {new Date(user.created_at).toDateString() || 'N/A'}
+            </h6>
           </div>
         </div>
       </div>

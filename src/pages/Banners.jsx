@@ -1,10 +1,69 @@
 import { Link } from 'react-router-dom';
 import Header from '../layouts/partials/header';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import AddBanner from '../components/AddBanner';
+import ReactPaginate from 'react-paginate';
+import Spinner from '../components/Spinner';
+import { useBannerStore } from '../store';
+import { toast } from 'react-toastify';
 
 export default function Banners() {
   const [isOpen, setIsOpen] = useState(false);
+  const { isLoading, banners, fetchBanners, setBanner, removeBanner } =
+    useBannerStore();
+  const [originalBanners, setOriginalBanners] = useState([]);
+  const [search, setSearch] = useState('');
+
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage] = useState(20);
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  let currentBanners = originalBanners?.slice(
+    indexOfFirstItem,
+    indexOfLastItem
+  );
+
+  const paginate = ({ selected }) => {
+    setCurrentPage(selected + 1);
+  };
+
+  const searchBanners = () => {
+    if (search === '') {
+      setOriginalBanners(banners);
+    } else {
+      const filteredBanners = originalBanners.filter((banner) =>
+        banner.title?.toLowerCase().includes(search.toLowerCase())
+      );
+      setOriginalBanners(filteredBanners);
+    }
+  };
+
+  useEffect(() => {
+    searchBanners();
+  }, [search]);
+
+  useEffect(() => {
+    fetchBanners();
+  }, []);
+
+  useEffect(() => {
+    if (banners.length > 0) {
+      setOriginalBanners(banners);
+    }
+  }, [banners]);
+
+  const deleteBanner = async (banner) => {
+    try {
+      const confirmDel = confirm(
+        'Are you sure you want to delete this banner? This action cannot be undone'
+      );
+      if (confirmDel) {
+        await removeBanner(banner);
+      }
+    } catch (error) {
+      toast.error(error.message);
+    }
+  };
 
   return (
     <div>
@@ -54,63 +113,98 @@ export default function Banners() {
             </div>
           </div>
           <div className='my-3'>
-            <div className='relative overflow-x-auto drop-shadow-xl bg-white sm:rounded-lg'>
-              <table className='w-full text-sm text-left text-gray-500'>
-                <thead className='text-xs text-gray-700 uppercase border-b-2 bg-white'>
-                  <tr>
-                    <th scope='col' className='px-6 py-3'>
-                      Title
-                    </th>
-                    <th scope='col' className='px-6 py-3'>
-                      Type
-                    </th>
-                    <th scope='col' className='px-6 py-3'>
-                      Price
-                    </th>
-                    <th scope='col' className='px-6 py-3'>
-                      Date
-                    </th>
-                    <th scope='col' className='px-6 py-3'>
-                      Actions
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {[...Array(7)].map((x, i) => (
-                    <tr className='bg-white border-b hover:bg-gray-150/30'>
-                      <td className='px-6 py-4 whitespace-nowrap'>
-                        <div className='flex items-center space-x-2'>
-                          {/* <img
-                            src='https://images.pexels.com/photos/5384445/pexels-photo-5384445.jpeg?auto=compress&cs=tinysrgb&w=1600'
-                            alt='pizza'
-                            className='w-8 h-8 rounded-full object-cover'
-                          /> */}
-                          <h1 className=''>20 Off</h1>
-                        </div>
-                      </td>
-                      <td className='px-6 py-4'>Rent/Sale</td>
-                      <td className='px-6 py-4'>20%/20</td>
-                      <td className='px-6 py-4'>08/08/2025</td>
-                      <td className='px-6 py-4 space-x-2'>
-                        <Link
-                          to='/banners/view'
-                          className='font-medium text-gray-150 bg-gray-150 px-3 py-0.5 rounded-md hover:text-gray-250 bg-opacity-10'
-                        >
-                          View
-                        </Link>
-                        <Link
-                          to='#'
-                          className='font-medium text-gray-150 bg-gray-150 px-3 py-0.5 rounded-md hover:text-gray-250 bg-opacity-10'
-                        >
-                          Edit
-                        </Link>
-                        {/* <a href="#" className="font-medium text-gray-250 hover:text-gray-150 hover:underline">Block</a> */}
-                      </td>
+            {isLoading ? (
+              <div className='flex w-full h-full'>
+                <Spinner />
+              </div>
+            ) : (
+              <div className='relative overflow-x-auto drop-shadow-xl bg-white sm:rounded-lg'>
+                <table className='w-full text-sm text-left text-gray-500'>
+                  <thead className='text-xs text-gray-700 uppercase border-b-2 bg-white'>
+                    <tr>
+                      <th scope='col' className='px-6 py-3'>
+                        Title
+                      </th>
+                      <th scope='col' className='px-6 py-3'>
+                        Description
+                      </th>
+                      <th scope='col' className='px-6 py-3'>
+                        Date
+                      </th>
+                      <th scope='col' className='px-6 py-3'>
+                        Actions
+                      </th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+                  </thead>
+                  <tbody>
+                    {currentBanners.map((banner) => (
+                      <tr
+                        key={banner.id}
+                        className='bg-white border-b hover:bg-gray-150/30'
+                      >
+                        <td className='px-6 py-4 whitespace-nowrap'>
+                          <div className='flex items-center space-x-2'>
+                            <img
+                              src={banner.image}
+                              alt='banner'
+                              className='w-8 h-8 rounded-full object-cover'
+                            />
+                            <h1 className=''>{banner.title || 'N/A'}</h1>
+                          </div>
+                        </td>
+                        <td className='px-6 py-4'>
+                          {banner.description || 'N/A'}
+                        </td>
+                        <td className='px-6 py-4'>
+                          {(banner.created_at &&
+                            new Date(banner.created_at).toDateString()) ||
+                            'N/A'}
+                        </td>
+                        <td className='px-6 py-4 space-x-2'>
+                          <Link
+                            to='#'
+                            onClick={() => {
+                              setBanner(banner);
+                              setIsOpen(true);
+                            }}
+                            className='font-medium text-green-400 bg-green-400 px-3 py-0.5 rounded-md hover:text-green-600 bg-opacity-10'
+                          >
+                            Edit
+                          </Link>
+                          <Link
+                            to='#'
+                            onClick={() => deleteBanner(banner)}
+                            className='font-medium text-red-400 bg-red-400 px-3 py-0.5 rounded-md hover:text-red-600 bg-opacity-10'
+                          >
+                            Delete
+                          </Link>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+                {banners.length > itemsPerPage && (
+                  <div className='py-4 px-4 flex items-start justify-center'>
+                    <ReactPaginate
+                      onPageChange={paginate}
+                      pageCount={Math.ceil(banners?.length / itemsPerPage)}
+                      previousLabel={'⮜'}
+                      nextLabel={'⮞'}
+                      breakLabel={'...'}
+                      marginPagesDisplayed={2}
+                      pageRangeDisplayed={2}
+                      containerClassName='flex space-x-2'
+                      breakLinkClassName='bg-gray-150 px-3 py-0.5 border border-gray-250 border-opacity-10 rounded-md hover:text-gray-250 bg-opacity-20 text-gray-900'
+                      pageLinkClassName='bg-gray-150 px-3 py-0.5 border border-gray-250 border-opacity-10 rounded-md hover:text-gray-250 bg-opacity-20 text-gray-900'
+                      previousLinkClassName='bg-gray-150 px-3 py-0.5 border border-gray-250 border-opacity-10 rounded-md hover:text-gray-250 bg-opacity-20 text-gray-900'
+                      nextLinkClassName='bg-gray-150 px-3 py-0.5 border border-gray-250 border-opacity-10 rounded-md hover:text-gray-250 bg-opacity-20 text-gray-900'
+                      activeLinkClassName='bg-orange-250 px-3 py-0.5 border border-gray-250 border-opacity-10 rounded-md text-gray-900 font-bold shadow-md hover:text-gray-250'
+                      disabledLinkClassName='bg-slate-800 px-3 py-0.5 border border-gray-250 border-opacity-10 rounded-md text-gray-500'
+                    />
+                  </div>
+                )}
+              </div>
+            )}
           </div>
         </div>
       </div>
