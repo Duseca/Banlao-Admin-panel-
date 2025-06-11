@@ -25,6 +25,17 @@ const useUserStore = create((set, get) => ({
     }
   },
 
+  fetchQueries: async () => {
+    set({ isLoading: true });
+    try {
+      const { data, error } = await supabase.from('queries').select('*');
+      set({ queries: data, isLoading: false });
+    } catch (error) {
+      toast.error(error);
+      set({ isLoading: false });
+    }
+  },
+
   blockUser: async (userId, isCurrentlyBlocked) => {
     set({ isLoading: true });
     try {

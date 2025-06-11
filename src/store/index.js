@@ -5,6 +5,7 @@ import useBannerStore from './bannerStore';
 import useNotificationStore from './notificationStore';
 import usePropertyStore from './propertyStore';
 import useSaleStore from './saleStore';
+import useFaqStore from './faqStore';
 
 export {
   useAuthStore,
@@ -13,4 +14,5 @@ export {
   useNotificationStore,
   usePropertyStore,
   useSaleStore,
+  useFaqStore,
 };
